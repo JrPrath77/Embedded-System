@@ -1,0 +1,114 @@
+#define leftMotorSpeed 180
+#define rightMotorSpeed 190
+//Line Follow Sensor
+int o1 = 8;
+int o2 = 9;
+int o3 = 10;
+int o4 = 11;
+int o5 = 12;
+
+/* Motor Define
+mo1,mo3 for forward rotation of motor
+mo2,mo4 for reverrse rotation of motor  */
+//right motor
+int enLeftMotor=A0;
+int mo1=A2;
+int mo2=A3;
+
+//left motor
+int enRightMotor=A1;
+int mo3=A4;
+int mo4=A5; 
+
+int O1,O2,O3,O4,O5;
+
+void setup() {
+  // put your setup code here, to run once:
+  // increses frequnecy of analogWrite signal
+  //below line is for lower speed at higher pwm value , it changes frequency of pwm signal on pin A0,A1
+  TCCR0B = TCCR0B & B11111000 | B00000010 ; 
+
+pinMode(enLeftMotor,OUTPUT);
+pinMode(mo1,OUTPUT);
+pinMode(mo2,OUTPUT);
+
+pinMode(enRightMotor,OUTPUT);
+pinMode(mo3,OUTPUT);
+pinMode(mo4,OUTPUT);
+
+pinMode(o1,INPUT);
+pinMode(o2,INPUT);
+pinMode(o3,INPUT);
+pinMode(o4,INPUT);
+pinMode(o5,INPUT);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+ O1=digitalRead(o1);
+ O2=digitalRead(o2);
+ O3=digitalRead(o3);
+ O4=digitalRead(o4);
+ O5=digitalRead(o5);
+
+line_follow();
+delay(100);  // to give time to sensors take reading
+}
+void move_forward(){
+  analogWrite(enLeftMotor,leftMotorSpeed);
+  analogWrite(enRightMotor,rightMotorSpeed);
+  digitalWrite(mo1,0);
+  digitalWrite(mo2,1);
+  digitalWrite(mo3,0);
+  digitalWrite(mo4,1);
+  delay(100);  
+}
+
+void stop(){
+  digitalWrite(mo1,0);
+  digitalWrite(mo2,0);
+  digitalWrite(mo3,0);
+  digitalWrite(mo4,0);
+  delay(100);  
+}
+
+void turn_right(){
+// soft right rotate right motor in reverse direction and left motor in forward direction
+  digitalWrite(mo1,0);
+  digitalWrite(mo2,1);
+  digitalWrite(mo3,1);
+  digitalWrite(mo4,0);
+
+  analogWrite(enRightMotor, rightMotorSpeed);
+  analogWrite(enLeftMotor, leftMotorSpeed);   
+ delay(100);  
+}
+
+void turn_left(){
+// soft right rotate right motor in reverse direction and left motor in forward direction
+  digitalWrite(mo1,1);
+  digitalWrite(mo2,0);
+  digitalWrite(mo3,0);
+  digitalWrite(mo4,1);
+
+  analogWrite(enRightMotor, rightMotorSpeed);
+  analogWrite(enLeftMotor, leftMotorSpeed);   
+  delay(100);  
+}
+
+void line_follow(){
+ // for black colour our sensor is low ...(zero)
+ // and for whit its high ..(1) 
+     if(O1==1 && O2==1 && O3==1 && O4==1 && O5==1){
+        stop();
+     }
+     else if(O2==0 && O3==0 && O4==0){
+        move_forward(); 
+     }
+     else if((O1==1 && O2==1) || O3==1){
+        turn_right();
+     }
+     else if((O4==1 && O5==1)|| O3==1){
+        turn_left();
+     }
+} // pick and place code remaining
